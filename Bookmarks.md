@@ -18,3 +18,8 @@ https://github.com/confluentinc/kafka-connect-datagen
 
 http://www.sdfonlinetester.info/#
 
+https://github.com/streamthoughts/kafka-connect-file-pulse
+https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/exporter/kafkaexporter
+https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/filelogreceiver
+
+

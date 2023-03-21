@@ -1,0 +1,18 @@
+asdf plugin add maven
+asdf install maven 3.9.1
+touch ~/.tools-versions
+sed -i '/^maven.*/d' ~/.tool-versions
+echo "maven 3.9.1" >> ~/.tool-versions
+
+git clone https://github.com/confluentinc/confluentinc-kafka-connect-elasticsearch.git
+pushd confluentinc-kafka-connect-elasticsearch
+git checkout v14.0.5
+mvn clean package 
+
+popd
+
+mkdir -p confluentinc-kafka-connect-elasticsearch
+pushd confluentinc-kafka-connect-elasticsearch
+unzip ../../target/components/packages/confluentinc-kafka-connect-elasticsearch-14.0.5.zip
+
+popd

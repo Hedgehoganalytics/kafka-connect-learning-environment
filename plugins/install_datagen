@@ -1,0 +1,19 @@
+asdf plugin add maven
+asdf install maven 3.9.1
+touch ~/.tools-versions
+sed -i '/^maven.*/d' ~/.tool-versions
+echo "maven 3.9.1" >> ~/.tool-versions
+
+git clone https://github.com/confluentinc/kafka-connect-datagen.git
+pushd kafka-connect-datagen
+git checkout v0.6.0
+mvn clean package
+
+popd
+
+mkdir -p confluentinc-kafka-connect-datagen
+pushd confluentinc-kafka-connect-datagen
+unzip ../../kafka-connect-datagen/target/components/packages/confluentinc-kafk
+a-connect-datagen-0.6.0.zip
+
+popd

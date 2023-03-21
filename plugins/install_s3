@@ -1,0 +1,22 @@
+export CONNECTOR=kafka-connect-storage-cloud
+export VERSION=10.4.2
+
+asdf plugin add maven
+asdf install maven 3.9.1
+touch ~/.tools-versions
+sed -i '/^maven.*/d' ~/.tool-versions
+echo "maven 3.9.1" >> ~/.tool-versions
+
+git clone https://github.com/confluentinc/${CONNECTOR}.git
+pushd ${CONNECTOR}
+git checkout v${VERSION}
+# read the documentation on how to configure tests
+mvn clean package -Dmaven.test.skip
+
+popd
+
+mkdir -p confluentinc-kafka-connect-s3
+pushd confluentinc-kafka-connect-s3
+unzip ../../${CONNECTOR}/kafka-connect-s3/target/components/packages/confluentinc-kafka-connect-s3-${VERSION}.zip
+
+popd
