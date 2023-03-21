@@ -1,0 +1,43 @@
+curl -XPUT "http://localhost:9200/_ingest/pipeline/nginx" -H "kbn-xsrf: reporting" -H "Content-Type: application/json" -d \
+'{
+  "processors": [
+    {
+      "date": {
+        "field": "datetime",
+        "formats": [
+          "dd/MMM/yyyy:HH:mm:ss Z",
+          "yyyy-MM-dd'\''T'\''HH:mm:ss"
+        ]
+      }
+    },
+    {
+      "date": {
+        "field": "IngestedTS",
+        "formats": [
+          "yyyy-MM-dd:HH:mm:ss"
+        ],
+        "target_field": "IngestedTS"
+      }
+    },
+    {
+      "uppercase": {
+        "field": "method"
+      }
+    },
+    {
+      "remove": {
+        "field": "datetime"
+      }
+    }
+  ],
+  "on_failure": [
+    {
+      "append": {
+        "field": "tags",
+        "value": [
+          "pipeline_fail"
+        ]
+      }
+    }
+  ]
+}'
