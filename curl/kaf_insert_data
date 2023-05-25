@@ -1,0 +1,1 @@
+flog -d1 -f json | kaf -b localhost:19092 produce nginx

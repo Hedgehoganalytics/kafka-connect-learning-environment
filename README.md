@@ -75,7 +75,7 @@ curl -s -X GET -H  "Content-Type:application/json" http://localhost:8083/connect
   "connector.class": "io.confluent.connect.elasticsearch.ElasticsearchSinkConnector",
   "topics": "nginx",
   "name": "nginx",
-  "connection.url": "http://elastic-master-01:9200,http://elastic-master-02:9200,http://elastic-master-03:9200",
+  "connection.url": "http://elastic-01:9200,http://elastic-02:9200,http://elastic-03:9200",
   "key.ignore": "true",
   "value.converter": "org.apache.kafka.connect.json.JsonConverter",
   "schema.ignore": "true"
@@ -106,7 +106,7 @@ curl -i -X PUT -H  "Content-Type:application/json" http://localhost:8083/connect
   "connector.class": "io.confluent.connect.elasticsearch.ElasticsearchSinkConnector",
   "topics": "nginx",
   "name": "nginx",
-  "connection.url": "http://es01:9200,http://es02:9200,http://es03:9200",
+  "connection.url": "http://elastic-01:9200,http://elastic-02:9200,http://elastic-03:9200",
   "key.ignore": "true",
   "value.converter": "org.apache.kafka.connect.json.JsonConverter",
   "schema.ignore": "true"

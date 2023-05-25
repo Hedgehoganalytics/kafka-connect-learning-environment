@@ -1,4 +1,6 @@
-curl -XPUT "http://localhost:9200/nginx" -H "kbn-xsrf: reporting" -H "Content-Type: application/json" -d'
+#!/usr/bin/env bash
+curl -XPUT "http://localhost:9200/nginx" -H "kbn-xsrf: reporting" -H "Content-Type: application/json" -d\
+'
 {
   "aliases": {},
   "mappings": {
@@ -54,28 +56,50 @@ curl -XPUT "http://localhost:9200/nginx" -H "kbn-xsrf: reporting" -H "Content-Ty
           }
         }
       },
-      "referer": {
-        "type": "text",
-        "fields": {
-          "keyword": {
-            "type": "keyword",
-            "ignore_above": 256
-          }
-        }
-      },
       "request": {
-        "type": "text",
-        "fields": {
-          "keyword": {
-            "type": "keyword",
-            "ignore_above": 256
+        "properties": {
+          "domain": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          },
+          "path": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          },
+          "query": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          },
+          "scheme": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
           }
         }
       },
       "status": {
         "type": "long"
       },
-      "user-identifier": {
+      "user-agent": {
         "type": "text",
         "fields": {
           "keyword": {
@@ -96,14 +120,9 @@ curl -XPUT "http://localhost:9200/nginx" -H "kbn-xsrf: reporting" -H "Content-Ty
         }
       },
       "number_of_shards": "1",
-      "provided_name": "nginx",
       "default_pipeline": "nginx",
-      "creation_date": "1679418895065",
-      "number_of_replicas": "1",
-      "uuid": "hGZdaxYrRc-fBsPklHB0CA",
-      "version": {
-        "created": "8060299"
-      }
+      "number_of_replicas": "1"
     }
   }
-}'
+}
+'

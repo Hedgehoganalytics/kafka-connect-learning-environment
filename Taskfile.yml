@@ -1,0 +1,24 @@
+version: '3'
+
+includes:
+  elasticsearch: ./elasticsearch/Taskfile.yml
+tasks:
+  print:
+    desc: A friendly greeting
+    cmds:
+      - echo "Hello, World!"
+  pull:
+    desc: Pull required Docker containers
+    cmds:
+      - echo "Pulling all containers"
+      - docker-compose pull
+      - docker-compose --profile elasticsearch start
+  stop:
+    desc: Stop all containers
+    cmds:
+      - echo "Stopping all containers"
+      - docker-compose stop
+  ps:
+    desc: List running containers
+    cmds:
+      - docker-compose ps

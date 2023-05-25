@@ -1,12 +1,12 @@
+#!/usr/bin/env bash
 curl -XPOST "http://localhost:9200/nginx/_doc/" -H "kbn-xsrf: reporting" -H "Content-Type: application/json" -d'
 {
   "host": "104.123.152.120",
-  "user-identifier": "sanford1268",
+  "user-agent": "python/requests",
   "datetime": "15/Mar/2023:20:55:01 +0000",
-  "method": "GET",
-  "request": "/synergistic/cutting-edge/viral",
+  "method": "get",
   "protocol": "HTTP/1.1",
-  "status": 501,
+  "status": 200,
   "bytes": 6363,
-  "referer": "http://www.globalaction-items.biz/synergistic/enhance"
+  "url": "https://authenticator/authenticate-user?username=matthew.hollick&password=kpopfan"
 }'

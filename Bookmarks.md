@@ -22,4 +22,4 @@ https://github.com/streamthoughts/kafka-connect-file-pulse
 https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/exporter/kafkaexporter
 https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/filelogreceiver
 
-
+https://rmoff.net/2019/10/07/kafka-connect-and-elasticsearch/

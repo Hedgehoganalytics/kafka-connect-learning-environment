@@ -1,9 +1,10 @@
 ---
 version: "3.7"
-name: next-gen-ingest
+name: dataworks
 services:
 
   broker:
+    image: docker.redpanda.com/redpandadata/redpanda:v23.1.1
     container_name: broker
     command:
       - redpanda
@@ -19,22 +20,23 @@ services:
       - --memory 1G
       - --mode dev-container
       - --default-log-level=error
-    image: docker.redpanda.com/redpandadata/redpanda:v23.1.1
     volumes:
       - broker:/var/lib/redpanda/data
-    networks:
-      - next-gen-ingest
     ports:
       - 18081:18081
       - 18082:18082
       - 19092:19092
       - 19644:9644
+    networks:
+      - dataworks
+    profiles:
+      - base
+      - kafka
+      - connect
 
   console:
     container_name: console
     image: docker.redpanda.com/vectorized/console:v2.2.2
-    networks:
-      - next-gen-ingest
     entrypoint: /bin/sh
     command: -c 'echo "$$CONSOLE_CONFIG_FILE" > /tmp/config.yml; /app/console'
     environment: 
@@ -55,25 +57,21 @@ services:
             - name: local-connect-cluster
               url: http://connect:8083
     ports:
-      - 8080:8080
+      - "8080:8080"
+    networks:
+      - dataworks
+    profiles:
+      - base
+      - kafka
+      - connect
     depends_on:
       - broker
 
   connect:
     image: docker.redpanda.com/redpandadata/connectors:latest
+    platform: 'linux/amd64'
     hostname: connect
     container_name: connect
-    networks:
-      - next-gen-ingest
-    platform: 'linux/amd64'
-    depends_on:
-      - broker
-    ports:
-      - "8083:8083"
-    volumes:
-      - ${PWD}/plugins/confluentinc-kafka-connect-elasticsearch:/opt/kafka/redpanda-plugins/confluentinc-kafka-connect-elasticsearch
-      - ${PWD}/plugins/confluentinc-kafka-connect-datagen:/opt/kafka/redpanda-plugins/confluentinc-kafka-connect-datagen
-      - ${PWD}/plugins/confluentinc-kafka-connect-s3:/opt/kafka/redpanda-plugins/confluentinc-kafka-connect-s3
     environment:
       CONNECT_CONFIGURATION: |
           key.converter=org.apache.kafka.connect.converters.ByteArrayConverter
@@ -94,16 +92,28 @@ services:
       CONNECT_LOG_LEVEL: info
       AWS_ACCESS_KEY_ID: "minio"
       AWS_SECRET_ACCESS_KEY: "minio123"
+    volumes:
+      - ${PWD}/plugins/confluentinc-kafka-connect-elasticsearch:/opt/kafka/redpanda-plugins/confluentinc-kafka-connect-elasticsearch
+      - ${PWD}/plugins/confluentinc-kafka-connect-datagen:/opt/kafka/redpanda-plugins/confluentinc-kafka-connect-datagen
+      - ${PWD}/plugins/confluentinc-kafka-connect-s3:/opt/kafka/redpanda-plugins/confluentinc-kafka-connect-s3
+    ports:
+      - "8083:8083"
+    networks:
+      - dataworks
+    profiles:
+      - connect
+    depends_on:
+      - broker
 
-  elastic-master-01:
+  elastic-01:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.6.2
-    hostname: elastic-master-01
-    container_name: elastic-master-01
+    hostname: elastic-01
+    container_name: elastic-01
     environment:
-      - node.name=elastic-master-01
+      - node.name=elastic-01
       - cluster.name=es-docker-cluster
-      - discovery.seed_hosts=elastic-master-02,elastic-master-03
-      - cluster.initial_master_nodes=elastic-master-01,elastic-master-02,elastic-master-03
+      - discovery.seed_hosts=elastic-02,elastic-03
+      - cluster.initial_master_nodes=elastic-01,elastic-02,elastic-03
       - bootstrap.memory_lock=true
       - xpack.security.enabled=false
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
@@ -112,21 +122,24 @@ services:
         soft: -1
         hard: -1
     volumes:
-      - data01:/usr/share/elasticsearch/data
+      - esdata01:/usr/share/elasticsearch/data
     ports:
       - 9200:9200
     networks:
-      - next-gen-ingest
+      - dataworks
+    profiles:
+      - elasticsearch
 
-  elastic-master-02:
+
+  elastic-02:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.6.2
-    hostname: elastic-master-02
-    container_name: elastic-master-02
+    hostname: elastic-02
+    container_name: elastic-02
     environment:
-      - node.name=elastic-master-02
+      - node.name=elastic-02
       - cluster.name=es-docker-cluster
-      - discovery.seed_hosts=elastic-master-01,elastic-master-03
-      - cluster.initial_master_nodes=elastic-master-01,elastic-master-02,elastic-master-03
+      - discovery.seed_hosts=elastic-01,elastic-03
+      - cluster.initial_master_nodes=elastic-01,elastic-02,elastic-03
       - bootstrap.memory_lock=true
       - xpack.security.enabled=false
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
@@ -135,19 +148,21 @@ services:
         soft: -1
         hard: -1
     volumes:
-      - data02:/usr/share/elasticsearch/data
+      - esdata02:/usr/share/elasticsearch/data
     networks:
-      - next-gen-ingest
+      - dataworks
+    profiles:
+      - elasticsearch
 
-  elastic-master-03:
+  elastic-03:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.6.2
-    hostname: elastic-master-03
-    container_name: elastic-master-03
+    hostname: elastic-03
+    container_name: elastic-03
     environment:
-      - node.name=elastic-master-03
+      - node.name=elastic-03
       - cluster.name=es-docker-cluster
-      - discovery.seed_hosts=elastic-master-01,elastic-master-02
-      - cluster.initial_master_nodes=elastic-master-01,elastic-master-02,elastic-master-03
+      - discovery.seed_hosts=elastic-01,elastic-02
+      - cluster.initial_master_nodes=elastic-01,elastic-02,elastic-03
       - bootstrap.memory_lock=true
       - xpack.security.enabled=false
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
@@ -156,34 +171,38 @@ services:
         soft: -1
         hard: -1
     volumes:
-      - data03:/usr/share/elasticsearch/data
+      - esdata03:/usr/share/elasticsearch/data
     networks:
-      - next-gen-ingest
+      - dataworks
+    profiles:
+      - elasticsearch
 
   kibana:
     image: docker.elastic.co/kibana/kibana:8.6.2
     container_name: kibana
     environment:
       SERVER_NAME: 127.0.0.1
-      ELASTICSEARCH_HOSTS: '["http://elastic-master-01:9200","http://elastic-master-02:9200","http://elastic-master-03:9200","http://es04:9200"]'
+      ELASTICSEARCH_HOSTS: '["http://elastic-01:9200","http://elastic-02:9200","http://elastic-03:9200","http://es04:9200"]'
       # XPACK_GRAPH_ENABLED: false
       # XPACK_ML_ENABLED: false
       # XPACK_REPORTING_ENABLED: false
       # XPACK_SECURITY_ENABLED: false
       # XPACK_WATCHER_ENABLED: false
+    restart: "unless-stopped"
     ports:
       - "5601:5601"
     networks:
-      - next-gen-ingest
+      - dataworks
+    profiles:
+      - elasticsearch
     depends_on:
-      - elastic-master-01
-      - elastic-master-02
-      - elastic-master-03
-    restart: "unless-stopped"
+      - elastic-01
+      - elastic-02
+      - elastic-03
 
   s3:
-    container_name: s3
     image: quay.io/minio/minio:RELEASE.2023-03-20T20-16-18Z
+    container_name: s3
     command: server --console-address ":9001" /data/minio
     ports:
       - "9000:9000"
@@ -201,19 +220,106 @@ services:
     volumes:
       - s3:/data
     networks:
-      - next-gen-ingest
+      - dataworks
+    profiles:
+      - s3
+
+  flink-jobmanager:
+    image: flink:latest
+    container_name: flink-jobmanager
+    hostname: flink-jobmanager
+    command: jobmanager
+    ports:
+      - "8081:8081"
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: flink-jobmanager 
+    networks:
+      - dataworks
+    profiles:
+      - flink
+
+  flink-taskmanager:
+    image: flink:latest
+    container_name: flink-taskmanager
+    hostname: flink-taskmanager
+    command: taskmanager
+    depends_on:
+      - flink-jobmanager
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: flink-jobmanager
+        taskmanager.numberOfTaskSlots: 2     
+    networks:
+      - dataworks
+    profiles:
+      - flink
+
+  flink-sql:
+    image: flink:latest
+    container_name: flink-sql
+    hostname: flink-sql
+    command: bin/sql-client.sh
+    depends_on:
+      - flink-jobmanager
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: flink-jobmanager
+        rest.address: flink-jobmanager
+    networks:
+      - dataworks
+    profiles:
+      - flink
+
+  qw-ingest:
+    image: quickwit/quickwit
+    container_name: qw-ingest
+    hostname: qw-ingest
+    profiles:
+      - quickwit
+
+  qw-query:
+    image: quickwit/quickwit
+    container_name: qw-query
+    hostname: qw-query
+    profiles:
+      - quickwit
+
+  postgres:
+    image: postgres
+    container_name: postgres
+    hostname: postgres
+    profiles:
+      - quickwit
+      - superset
+
+  redis:
+    image: redis
+    container_name: redis
+    hostname: redis
+    profiles:
+      - quickwit
+      - superset
+
+  superset:
+    image: superset
+    profiles:
+      - superset
 
 volumes:
-  data01:
+  esdata01:
     driver: local
-  data02:
+  esdata02:
     driver: local
-  data03:
+  esdata03:
     driver: local
   broker: null
   s3:
     driver: local
 
 networks:
-  next-gen-ingest:
+  dataworks:
     driver: bridge

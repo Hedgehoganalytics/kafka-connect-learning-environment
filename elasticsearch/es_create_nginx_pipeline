@@ -1,22 +1,15 @@
+#!/usr/bin/env bash
 curl -XPUT "http://localhost:9200/_ingest/pipeline/nginx" -H "kbn-xsrf: reporting" -H "Content-Type: application/json" -d \
-'{
+'
+{
   "processors": [
     {
       "date": {
         "field": "datetime",
         "formats": [
           "dd/MMM/yyyy:HH:mm:ss Z",
-          "yyyy-MM-dd'\''T'\''HH:mm:ss"
+          "yyyy-MM-ddTHH:mm:ss"
         ]
-      }
-    },
-    {
-      "date": {
-        "field": "IngestedTS",
-        "formats": [
-          "yyyy-MM-dd:HH:mm:ss"
-        ],
-        "target_field": "IngestedTS"
       }
     },
     {
@@ -27,6 +20,23 @@ curl -XPUT "http://localhost:9200/_ingest/pipeline/nginx" -H "kbn-xsrf: reportin
     {
       "remove": {
         "field": "datetime"
+      }
+    },
+    {
+      "uri_parts": {
+        "field": "url",
+        "target_field": "request",
+        "keep_original": false,
+        "remove_if_successful": true,
+        "ignore_failure": true
+      }
+    },
+    {
+      "gsub": {
+        "field": "request.query",
+        "pattern": "^.*password.*$",
+        "replacement": "REDACTED",
+        "ignore_failure": true
       }
     }
   ],
@@ -40,4 +50,5 @@ curl -XPUT "http://localhost:9200/_ingest/pipeline/nginx" -H "kbn-xsrf: reportin
       }
     }
   ]
-}'
+}
+'

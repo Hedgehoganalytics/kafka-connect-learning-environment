@@ -4,7 +4,7 @@ curl -X PUT http://localhost:8083/connectors/nginx/config -H "Content-Type: appl
 '{
  "name": "nginx",
  "connector.class": "io.confluent.connect.elasticsearch.ElasticsearchSinkConnector",
- "connection.url": "http://elastic-master-01:9200,http://elastic-master-02:9200,http://elastic-master-03:9200",
+ "connection.url": "http://elastic-01:9200,http://elastic-02:9200,http://elastic-03:9200",
  "tasks.max": "1",
  "topics": "nginx",
  "type.name": "_doc",
