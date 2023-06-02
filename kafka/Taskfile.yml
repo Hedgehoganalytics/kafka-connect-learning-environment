@@ -1,0 +1,29 @@
+version: '3'
+
+tasks:  
+  start:
+    desc: Start the Kafka infrastrusture
+    cmds:
+      - echo "Starting Kafka"
+      - docker-compose --profile kafka start
+  stop:
+    desc: Stop the Kafka infrastructure
+    cmds:
+      - echo "Stopping Kafka"
+      - docker-compose --profile kafka stop
+  list_topics:
+    desc: List Kafka topics
+    cmds:
+      - docker run --env BROKERS="broker:9092" --platform="linux/amd64" --network="dataworks_dataworks" deviceinsight/kafkactl:latest get topics
+  create_topic:
+    desc: Create a Kafka topic
+    cmds:
+      - docker run --env BROKERS="broker:9092" --platform="linux/amd64" --network="dataworks_dataworks" deviceinsight/kafkactl:latest create topic {{.CLI_ARGS}}
+  delete_topic:
+    desc: Delete a Kafka topic
+    cmds:
+      - docker run --env BROKERS="broker:9092" --platform="linux/amd64" --network="dataworks_dataworks" deviceinsight/kafkactl:latest delete topic {{.CLI_ARGS}}
+  produce_records:
+    desc: Write messages to kafka to be ingested into Elasticsearch
+    cmds:
+      - kafka/kafka_produce_record {{.CLI_ARGS}}

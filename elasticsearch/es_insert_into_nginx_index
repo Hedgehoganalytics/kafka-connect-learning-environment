@@ -1,12 +1,41 @@
 #!/usr/bin/env bash
-curl -XPOST "http://localhost:9200/nginx/_doc/" -H "kbn-xsrf: reporting" -H "Content-Type: application/json" -d'
-{
-  "host": "104.123.152.120",
-  "user-agent": "python/requests",
-  "datetime": "15/Mar/2023:20:55:01 +0000",
-  "method": "get",
-  "protocol": "HTTP/1.1",
-  "status": 200,
-  "bytes": 6363,
-  "url": "https://authenticator/authenticate-user?username=matthew.hollick&password=kpopfan"
-}'
+
+select_random() {
+  printf "%s\0" "$@" | shuf -z -n1 | tr -d '\0'
+}
+
+MESSAGE_COUNT=${1:-1}
+MESSGAE_DELAY=${2:-1}
+COUNTER=1
+
+while [ $COUNTER -le $MESSAGE_COUNT ]; do
+  TIMESTAMP=$(date '+%d/%b/%Y:%H:%M:%S %z')
+  ARRAY_QUERY[0]="username=matthew.hollick&password=kpopfan"
+  ARRAY_QUERY[1]="keepalive"
+  ARRAY_STATUS[0]="200"
+  ARRAY_STATUS[1]="200"
+  ARRAY_STATUS[2]="503"
+  ARRAY_HOST[0]=$(dd if=/dev/urandom bs=4 count=1 2>/dev/null | od -An -tu1 | sed -e 's/^ *//' -e 's/ *$//' -e 's/  */./g')
+  ARRAY_HOST[1]=$(curl -s ifconfig.me/ip)
+
+  QUERY=$(select_random "${ARRAY_QUERY[@]}")
+  STATUS=$(select_random "${ARRAY_STATUS[@]}")
+  HOST=$(select_random "${ARRAY_HOST[@]}")
+
+  echo '
+  {
+    "host": "'"$HOST"'",
+    "user-agent": "python/requests",
+    "datetime": "'"$TIMESTAMP"'",
+    "method": "get",
+    "protocol": "HTTP/1.1",
+    "status": '"$STATUS"',
+    "bytes": 6363,
+    "url": "https://authenticator/authenticate-user?'"$QUERY"'"
+  }
+  ' | curl -XPOST "http://localhost:9200/nginx/_doc/" -H "kbn-xsrf: reporting" -H "Content-Type: application/json" -d @-
+
+  echo ""
+  sleep $MESSGAE_DELAY
+  COUNTER=$(($COUNTER+1))
+done

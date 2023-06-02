@@ -2,6 +2,9 @@ version: '3'
 
 includes:
   elasticsearch: ./elasticsearch/Taskfile.yml
+  connect: ./connect/Taskfile.yml
+  kafka: ./kafka/Taskfile.yml
+  monitoring: ./monitoring/Taskfile.yml
 tasks:
   print:
     desc: A friendly greeting
@@ -17,8 +20,17 @@ tasks:
     desc: Stop all containers
     cmds:
       - echo "Stopping all containers"
-      - docker-compose stop
-  ps:
+      - task connect:stop
+      - task kafka:stop
+      - task elasticsearch:stop
+      - task monitoring:stop
+  default:
+    aliases: [ps]
     desc: List running containers
     cmds:
       - docker-compose ps
+  top:
+    desc: Show container metrics
+    cmds:
+      - docker run --rm -ti --name=ctop --volume /var/run/docker.sock:/var/run/docker.sock:ro quay.io/vektorlab/ctop:latest -a
+

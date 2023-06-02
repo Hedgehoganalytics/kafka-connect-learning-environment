@@ -1,3 +1,7 @@
+Ignore most of this.
+If you look at something expect it to be at least half broken.
+
+
 # Things that need to be done by hand
 
 ## 3rd party connectors

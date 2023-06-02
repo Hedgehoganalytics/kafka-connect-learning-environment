@@ -2,28 +2,32 @@ version: '3'
 
 tasks:  
   start:
-    desc: Start the Elasticsearch cluster
+    desc: "Start the Elasticsearch cluster."
     cmds:
-      - echo "Starting Elasticsearch"
+      - echo "Starting Elasticsearch."
       - docker-compose --profile elasticsearch start
+  stop:
+    desc: "Stop the Elasticsearch cluster."
+    cmds:
+      - echo "Stopping Elasticsearch."
+      - docker-compose --profile elasticsearch stop
   create_nginx_index:
     desc: Create the nginx index
     cmds:
-      - echo "Creating the nginx index"
+      - echo "Creating the nginx index."
       - ./elasticsearch/es_create_nginx_index
   delete_nginx_index:
-    desc: "Delete the nginx index"
+    desc: "Delete the nginx index."
     cmds: 
-      - echo "Deleting the nginx index"
+      - echo "Deleting the nginx index."
       - ./elasticsearch/es_delete_nginx_index
   create_nginx_pipeline:
-    desc: "Create the nginx pipeline"
+    desc: "Create the nginx pipeline."
     cmds:
-      - echo "Creating the nginx pipeline"
+      - echo "Creating the nginx pipeline."
       - ./elasticsearch/es_create_nginx_pipeline
   insert_nginx_data:
-    desc: "Insert some test data into the nginx index"
+    desc: "Insert test records into the nginx index."
     cmds:
       - echo "Inserting data into the nginx index"
-      - ./elasticsearch/es_insert_into_nginx_index
-
+      - ./elasticsearch/es_insert_into_nginx_index {{.CLI_ARGS}}

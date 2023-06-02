@@ -1,0 +1,13 @@
+version: '3'
+
+tasks:  
+  start:
+    desc: "Starts the monitoring components"
+    cmds:
+      - echo "Starting..."
+      - docker-compose --profile monitoring start
+  stop:
+    desc: "Stops the monitoring components"
+    cmds:
+      - echo "Stopping..."
+      - docker-compose --profile monitoring stop

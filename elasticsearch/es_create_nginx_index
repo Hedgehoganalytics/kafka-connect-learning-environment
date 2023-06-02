@@ -119,7 +119,7 @@ curl -XPUT "http://localhost:9200/nginx" -H "kbn-xsrf: reporting" -H "Content-Ty
           }
         }
       },
-      "number_of_shards": "1",
+      "number_of_shards": "3",
       "default_pipeline": "nginx",
       "number_of_replicas": "1"
     }

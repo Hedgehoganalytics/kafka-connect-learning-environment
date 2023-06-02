@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+echo "This might be a bad thing. There is no guarantee that PII will be removed from a DLQ."
+
+curl -X PUT http://localhost:8083/connectors/dlq/config -H "Content-Type: application/json" -d \
+'{
+ "name": "dlq",
+ "connector.class": "io.confluent.connect.elasticsearch.ElasticsearchSinkConnector",
+ "connection.url": "http://elastic-01:9200,http://elastic-02:9200,http://elastic-03:9200",
+ "tasks.max": "1",
+ "topics": "dlq",
+ "type.name": "_doc",
+ "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+ "value.converter.schemas.enable": "false",
+ "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+ "key.converter.schemas.enable": "false",
+ "schema.ignore": "true",
+ "key.ignore": "true",
+ "errors.tolerance": "all",
+ "behavior.on.malformed.documents": "ignore",
+ "transforms": "Cast",
+ "transforms.Cast.type": "org.apache.kafka.connect.transforms.Cast$Value",
+ "transforms.Cast.spec": "bytes:string,status:string"
+}'

@@ -1,0 +1,17 @@
+# my global config
+global:
+  scrape_interval:     15s
+  evaluation_interval: 15s
+  external_labels:
+      monitor: 'dataworks'
+rule_files:
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['host.docker.internal:9090'] # Only works on Docker Desktop for Mac
+  - job_name: 'docker'
+    static_configs:
+      - targets: ['host.docker.internal:9323']
+  - job_name: cadvisor
+    static_configs:
+    - targets: ['cadvisor:8080']

@@ -1,0 +1,40 @@
+version: '3'
+
+env:
+  s3_sink_version: 3.18.2
+  s3_source_version: 3.18.2
+  s3_stream_sink_version: 3.18.2
+
+tasks:  
+  start:
+    desc: Start the Kafka connect infrastrusture
+    cmds:
+      - echo "Starting Kafka connect"
+      - docker-compose --profile connect start
+  stop:
+    desc: Stop the Kafka connect infrastrusture
+    cmds:
+      - echo "Stopping Kafka connect"
+      - docker-compose --profile connect stop
+  deploy_nginx:
+    desc: Deploy the Elasticsearch connector for nginx
+    cmds:
+      - echo "Deploying Elasticsearch connector for nginx topic"
+      - ./connect/connect_create_es_sink_nginx
+  build_s3_sink:
+    cmds:
+      - cd connect && wget https://repo.maven.apache.org/maven2/org/apache/camel/kafkaconnector/camel-aws-s3-sink-kafka-connector/"${s3_sink_version}"/camel-aws-s3-sink-kafka-connector-"${s3_sink_version}"-package.tar.gz --output-document=s3-sink.tar.gz
+      - cd connect && tar xf s3-sink.tar.gz
+  build_s3_source:
+    cmds:
+      - cd connect && wget https://repo.maven.apache.org/maven2/org/apache/camel/kafkaconnector/camel-aws-s3-source-kafka-connector/"${s3_source_version}"/camel-aws-s3-source-kafka-connector-"${s3_source_version}"-package.tar.gz --output-document=s3-source.tar.gz
+      - cd connect && tar xf s3-source.tar.gz
+  build_s3_stream_sink:
+    cmds:
+      - cd connect && wget https://repo.maven.apache.org/maven2/org/apache/camel/kafkaconnector/camel-aws-s3-streaming-upload-sink-kafka-connector/"${s3_stream_sink_version}"/camel-aws-s3-streaming-upload-sink-kafka-connector-"${s3_stream_sink_version}"-package.tar.gz --output-document=s3-stream-sink.tar.gz
+      - cd connect && tar xf s3-stream-sink.tar.gz
+  build_connectors:
+    cmds:
+      - task: build_s3_sink
+      - task: build_s3_source
+      - task: build_s3_stream_sink
