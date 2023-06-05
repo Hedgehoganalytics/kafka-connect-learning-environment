@@ -1,0 +1,15 @@
+version: '3'
+
+env:
+  JMETER_VERSION: 5.5
+
+tasks:
+  fetch:
+    desc: Download Apache Jmeter
+    cmds:
+      - curl https://dlcdn.apache.org//jmeter/binaries/apache-jmeter-${JMETER_VERSION}.tgz | tar zxf - 
+      - curl -L -o apache-jmeter-${JMETER_VERSION}/lib/ext/jmeter-plugins-manager.jar https://jmeter-plugins.org/get/ 
+  start:
+    desc: Start Jmeter
+    cmds:
+      - apache-jmeter-${JMETER_VERSION}/bin/jmeter.sh

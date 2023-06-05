@@ -1,0 +1,54 @@
+{panel:title=User stories}
+As a Product Owner
+I want to minimise the cost of reliable ingest of data into Elasticsearch
+So that platform cost is controlled
+
+As a Telemetry Engineer
+I want to understand the characteristics and complexity of a Kafka Connect based elasticsearch data pipeline
+So that I might be able to recommend Kafka connect as a solution
+
+As a Platform Engineer
+I want to manage all the platform's configuration in terraform
+So that other teams can more easily contribute, configuration is easier to test and faster to deploy and I do not need to learn as many technologies.
+{panel}
+{panel:title=What happens if we don’t do it?}
+probably logstash in docker which would suck for a few different reasons.
+{panel}
+{panel:title=Measure of value?}
+Simplification and speed of managing the platform
+Cost.
+Avoid running Logstash in docker.
+If we use MSK Connect as part of the alerting epic we can reduce the number of technologies used.
+{panel}
+{panel:title=Notes}
+The current solution is complex and not cost effective.
+It was about as good as we could get with redis.
+Moving away from logstash on ingest nodes was a driver behind Kafka adoption, this spike might validate that assumption and move us in that direction.
+
+This ticket is a placeholder - there are a few questions which need to be explored:
+ - Can we reliably classify and split inbound data into dedicated topics?
+ -- Assumption that this is implemented as configuration enforced on clients with user accounts and ACLs to ensure the correct topic is used
+ - Are there unexpected failure scenarios with Kafka Connect?
+ - Is intra AZ network traffic between MSK Kafka and MSK Connect free?
+ -- If not, does Kafka Connect support the same rack-awareness options we use in Logstash?
+ -- Are there any logstash filters on ingest nodes that can not be replicated in an Elasticsearch pipeline and if so, do we need them?
+ --- There are over 100 if statements in the filters on ingest nodes, some of them have already been identified as not needed (ie the platform do longer runs ufw on ec2 instances.)
+ - How might we generate aggregate metrics from data streamed from a topic in the same manner as we currently do with StatsD?
+ -- Until we have a good solution a single minimally sized logstash instance could do this
+ - How much are the (assumed) cost benefits and do they outweigh the work needed to implement.
+ -- Experience with Kafka Connect also has positive implications for work done on alerting that uses Kafka Connect.
+ - Given there is a choice of connectors for Elasticsearch, which should we use?
+ - Using S3 as a Kafka/MSK Connect sink appears simple, but how might we restore from this data?
+ -- The Apache Camel's s3 sink and source connectors are open source.
+ -- Confluent's s3 sink connector is open source.
+ -- Confluent's s3 source connector is commercial.
+ - With Kafka/MSK connect as a consideration, how might we use it to improve the capabilities of the loadtest environment?
+ -- MirrorMaker2 runs as a Kafka connector - much easier to start and stop than an additional ASG of ingest nodes in production.
+ - CIP already use Kafka Connect - is there any synergy between our efforts?
+
+Some work has been done on this out of hours with positive initial findings which were presented to the team with over 20k vaguely nginx shaped records/second generated, validated, modified and ingested on a laptop. See [https://github.com/Hedgehoganalytics/kafka-connect-learning-environment] for details.
+{panel}
+{panel:title=Acceptance Criteria}
+ # Presentation to team{panel}
+{panel:title=Definition of Done}
+{panel}

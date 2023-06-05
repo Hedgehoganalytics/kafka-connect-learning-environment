@@ -1,2 +1,4 @@
 plugins/con*/*
 connect/plugins/
+apache-jmeter/apache-jmeter*/*
+apache-jmeter/jmeter.log
