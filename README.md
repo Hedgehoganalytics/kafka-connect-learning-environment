@@ -25,7 +25,7 @@ Some highlights:
 - https://www.confluent.io/hub/redis/redis-enterprise-kafka
 - https://www.confluent.io/hub/confluentinc/kafka-connect-jdbc
 
-
+# NOTE: LOTS OF WHAT FOLLOWS HAS BEEN REPLACED WITH TASK TARGETS.
 
 ### Managing Kafka connect
 
