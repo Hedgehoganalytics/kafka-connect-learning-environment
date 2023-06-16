@@ -1,0 +1,13 @@
+version: '3'
+
+tasks:  
+  start:
+    desc: Start the Trino infrastrusture
+    cmds:
+      - echo "Starting Trino"
+      - docker-compose --profile trino start
+  stop:
+    desc: Stop the Kafka infrastructure
+    cmds:
+      - echo "Stopping Trino"
+      - docker-compose --profile trino stop

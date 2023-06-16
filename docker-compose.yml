@@ -261,6 +261,17 @@ services:
       - dataworks
     profiles:
       - flink
+  trino:
+    image: trinodb/trino
+    container_name: trino
+    hostname: trino
+    network_mode: "host"
+    profiles:
+      - trino
+    ports:
+      - "8082:8080"
+    volumes:
+      - ${PWD}/trino/etc/trino:/etc/trino
   qw-ingest:
     image: quickwit/quickwit
     container_name: qw-ingest

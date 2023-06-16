@@ -5,6 +5,8 @@ includes:
   connect: ./connect/Taskfile.yml
   kafka: ./kafka/Taskfile.yml
   monitoring: ./monitoring/Taskfile.yml
+  flink: ./flink/Taskfile.yml
+  trino: ./trino/Taskfile.yml
 tasks:
   print:
     desc: A friendly greeting
@@ -24,6 +26,8 @@ tasks:
       - task kafka:stop
       - task elasticsearch:stop
       - task monitoring:stop
+      - task flink:stop
+      - task trino:stop
   default:
     aliases: [ps]
     desc: List running containers

@@ -1,0 +1,18 @@
+version: '3'
+
+env:
+  s3_sink_version: 3.18.2
+  s3_source_version: 3.18.2
+  s3_stream_sink_version: 3.18.2
+
+tasks:  
+  start:
+    desc: Start Flink
+    cmds:
+      - echo "Starting Flink"
+      - docker-compose --profile flink start
+  stop:
+    desc: Stop Flink
+    cmds:
+      - echo "Stopping Flink"
+      - docker-compose --profile flink stop
